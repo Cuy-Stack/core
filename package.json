@@ -31,5 +31,13 @@
     "reflect-metadata": "^0.2.2",
     "tsc": "^2.0.4",
     "tsup": "^8.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuy-stack/core.git"
+  },
+  "homepage": "https://github.com/cuy-stack/core",
+  "bugs": {
+    "url": "https://github.com/cuy-stack/core/issues"
   }
 }

@@ -1,0 +1,73 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build package
+        run: bun run build
+
+      - name: Publish package to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Send Telegram Notification
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_IDS: ${{ vars.TELEGRAM_CHAT_IDS }}
+          REPO: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          COMMIT_URL="https://github.com/${REPO}/commit/${COMMIT_SHA}"
+          COMMIT_MSG="${COMMIT_MESSAGE:-Manual trigger}"
+
+          # Format pesan Telegram
+          TEXT=$(cat <<EOF
+          *Publish npm berhasil* ✅
+          Package dari repository *${REPO}* sudah berhasil dipublish.
+
+          *Commit:*  
+          \`${COMMIT_MSG}\`
+
+          [Klik untuk melihat commit](${COMMIT_URL})
+          EOF
+          )
+
+          # Chat ID diambil dari env TELEGRAM_CHAT_IDS (dipisahkan koma)
+          IFS=',' read -ra IDS <<< "$CHAT_IDS"
+          for ID in "${IDS[@]}"; do
+            echo "Mengirim ke $ID..."
+            curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+              -d chat_id="${ID}" \
+              -d parse_mode="Markdown" \
+              --data-urlencode "text=${TEXT}"
+          done
