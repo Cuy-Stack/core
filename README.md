@@ -121,8 +121,8 @@ class AdminController {
 // Or apply middleware to specific routes
 @Controller('/posts')
 class PostController {
-  @Use(authMiddleware)
   @Post('/')
+  @Use(authMiddleware)
   createPost(req: Request, res: Response) {
     res.json({ id: 1, title: 'New Post' });
   }
