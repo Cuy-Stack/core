@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "reflect-metadata": "^0.2.2",
-    "tsc": "^2.0.4",
     "tsup": "^8.5.1"
   },
   "repository": {
