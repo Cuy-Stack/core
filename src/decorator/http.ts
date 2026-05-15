@@ -173,8 +173,4 @@ export function registerControllers(router: Router, controllers: any[]) {
       );
     });
   });
-
-  console.log(
-    `Registered ${routeDocumentationRegistry.length} routes from ${controllers.length} controllers.`,
-  );
 }
