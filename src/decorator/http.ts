@@ -1,52 +1,17 @@
 import 'reflect-metadata';
 import type { NextFunction, Request, Response, Router } from 'express';
+import type {
+  RouteDoc,
+  RouteDefinition,
+  RouteDocumentationEntry,
+} from '../types/decorator';
 
 const ROUTES_KEY = Symbol('routes');
 const INJECT_KEY = Symbol('inject');
 const MIDDLEWARE_KEY = Symbol('middlewares');
 const CONTROLLER_MIDDLEWARE_KEY = Symbol('controller_middlewares');
 
-export type RouteDocResponse = {
-  description: string;
-  content: {
-    type: string;
-    schema: string | null;
-  };
-};
-
-export type AuthStrategy = {
-  name: string;
-  description: string;
-  value: Record<string, string>;
-};
-
-export type RouteDoc = {
-  summary: string;
-  description: string;
-  body: any;
-  auth_strategy?: AuthStrategy | null;
-  headers?: Record<string, string>;
-  response: Record<number | string, RouteDocResponse>;
-  tags: string[];
-  params?: Record<string, string>;
-  hide?: boolean;
-};
-
-export type RouteDocumentationEntry = {
-  method: 'get' | 'post' | 'put' | 'delete';
-  path: string;
-  handlerName: string;
-  documentation: RouteDoc | null;
-};
-
 const routeDocumentationRegistry: RouteDocumentationEntry[] = [];
-
-export type RouteDefinition = {
-  path: string;
-  method: 'get' | 'post' | 'put' | 'delete';
-  handlerName: string;
-  documentation?: RouteDoc;
-};
 
 type Middleware = (
   req: Request,
